@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Child</title>
+  </head>
+  <body>
+    <h2>Child iframe</h2>
+  </body>
+
+  <script>
+    console.log("hi");
+    window.addEventListener("message", (event) => {
+      if (event.origin !== "http://localhost:9090") return; // replace with parent's origin
+      const msg = event.data;
+
+      if (msg.type === "hello") {
+        console.log("Parent says:", event.source);
+        // reply back
+        let x = event.source;
+        let y = event.origin;
+        console.log("source:", x);
+        console.log("origin:", y);
+
+        event.source.postMessage(
+          { type: "reply", payload: `fdas` },
+          event.origin
+        );
+      }
+
+      if (msg.type === "sendMessage") {
+        const data = msg.payload;
+        // Show in iframe console or send back
+        const h1 = document.createElement("h1");
+        h1.innerText = msg.payload;
+        document.body.appendChild(h1);
+      }
+    });
+  </script>
+</html>

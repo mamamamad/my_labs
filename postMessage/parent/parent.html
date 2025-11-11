@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Parent</title>
+  </head>
+  <body>
+    Message: <input type="text" id="message" />
+    <input type="submit" value="Submit message" onclick="sendMessage()" />
+
+    <iframe
+      id="child"
+      src="http://localhost:8000/child.html"
+      style="width: 100%; height: 200px"
+    ></iframe>
+  </body>
+
+  <script>
+    const iframe = document.getElementById("child");
+
+    // Send initial hello when iframe loads
+    iframe.addEventListener("load", () => {
+      const msg = { type: "hello", payload: "Hi child" };
+      iframe.contentWindow.postMessage(msg, "http://localhost:8000");
+    });
+
+    // Function to send message from input to child
+    function sendMessage() {
+      const data = document.getElementById("message").value;
+      const msg = { type: "sendMessage", payload: data };
+      iframe.contentWindow.postMessage(msg, "http://localhost:8000");
+    }
+
+    // Listen for messages from child
+    window.addEventListener("message", (event) => {
+      if (event.origin !== "http://localhost:8000") return; // validate origin
+      const msg = event.data;
+
+      // Display messages from child
+      if (msg.type === "reply" || msg.type === "sendMessage") {
+        const h1 = document.createElement("h1");
+        h1.innerText = msg.payload;
+        document.body.appendChild(h1);
+      }
+
+      console.log("Got from child:", msg);
+    });
+  </script>
+</html>
